@@ -34,6 +34,10 @@
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
 @media(max-width:810px){html,body{height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto}#game{display:flow-root}#customerMeta{left:54%}}
 @media(min-width:811px){#customerMeta{left:70%;bottom:58%}}
+#soundToggle{z-index:27;min-height:32px}
+#audioPanel{position:fixed;z-index:36;left:28px;top:145px;width:min(330px,calc(100vw - 32px));max-height:calc(100dvh - 165px);overflow:auto;background:linear-gradient(135deg,#29362d,#111e1a);border:1px solid #b4a47a;border-top:4px solid #d1b37e;padding:20px;box-shadow:0 18px 60px #000b;color:#e9dfc3;font:11px/1.6 var(--mono)}
+#audioPanel[hidden]{display:none}.audioHeading{display:flex;align-items:center;justify-content:space-between;letter-spacing:.15em;font-weight:700;color:var(--gold)}.audioHeading button{border:0;background:none;color:var(--gold);font-size:23px;line-height:1;padding:3px 7px}#audioPanel label{display:flex;justify-content:space-between;margin-top:17px;font-size:10px;letter-spacing:.08em}#audioPanel input[type=range]{width:100%;accent-color:#ddbe7e;margin:12px 0;height:22px;cursor:pointer}#audioPanel output{color:#b7cfaa}#audioStatus{color:#abbfa9;min-height:35px;font-size:10px}#audioPanel>.secondary{width:100%;margin-top:12px}#audioPanel>.primary{width:100%;margin-top:9px;font-size:10px}#audioPanel button[hidden]{display:none}.audioCaption{font-size:9px;color:#a8b5a0;margin:14px 0 0}
+@media(max-width:810px){#audioPanel{top:110px;left:16px;max-height:calc(100dvh - 130px)}}
 </style>
 </head>
 <body>
@@ -98,7 +102,16 @@
  <svg class="deskMug" viewBox="0 0 100 120" aria-hidden="true"><ellipse cx="48" cy="105" rx="43" ry="10" fill="#0a130e" opacity=".65"/><path d="M61 54q35-9 29 21-4 15-23 12" fill="none" stroke="#b8aa86" stroke-width="9"/><path d="M17 47h55v48q-25 19-52 0Z" fill="#c3b490" stroke="#776d51" stroke-width="2"/><ellipse cx="44" cy="47" rx="27" ry="8" fill="#dfcfa9"/><ellipse cx="44" cy="48" rx="22" ry="5" fill="#312b1b"/><text x="45" y="79" text-anchor="middle" fill="#5c5338" font-family="monospace" font-size="10">NIGHT</text><text x="45" y="90" text-anchor="middle" fill="#5c5338" font-family="monospace" font-size="10">SHIFT</text><g class="steam" fill="none" stroke="#e5d8b2" stroke-width="2"><path d="M32 33q-13-10 0-21M52 30q-10-11 1-24"/></g></svg>
 </div>
 <svg id="deskLamp" viewBox="0 0 140 200" aria-hidden="true"><ellipse cx="78" cy="192" rx="54" ry="7" fill="#111b13"/><path d="M42 185h70l12 10H30Z" fill="#514b35" stroke="#b4a27c" stroke-width="2"/><path d="M78 184V119L46 51" stroke="#b3a178" stroke-width="8"/><path d="M78 184V119L46 51" stroke="#4a5340" stroke-width="4"/><circle cx="78" cy="118" r="7" fill="#bba97b"/><path d="M21 30q35-24 54 14l-1 23-68-5Z" fill="#435a3d" stroke="#94a273" stroke-width="2"/><ellipse cx="40" cy="64" rx="34" ry="7" fill="#f3ca82"/><ellipse cx="40" cy="64" rx="20" ry="4" fill="#fff0b1"/></svg>
-<button id="soundToggle" aria-pressed="false">SOUND: OFF</button>
+<button id="soundToggle" aria-expanded="false" aria-controls="audioPanel">AUDIO / SETTINGS</button>
+<section id="audioPanel" hidden role="dialog" aria-label="Audio settings">
+ <div class="audioHeading">BOOTH AUDIO <button id="closeAudio" aria-label="Close audio settings">×</button></div>
+ <p id="audioStatus" role="status">Clock in to hear the station.</p>
+ <label for="masterVolume">MASTER <output id="masterValue"></output></label><input id="masterVolume" type="range" min="0" max="100" step="1">
+ <label for="ambienceVolume">AMBIENCE <output id="ambienceValue"></output></label><input id="ambienceVolume" type="range" min="0" max="100" step="1">
+ <label for="effectsVolume">SOUND EFFECTS <output id="effectsValue"></output></label><input id="effectsVolume" type="range" min="0" max="100" step="1">
+ <button id="muteAudio" class="secondary" aria-pressed="false">MUTE</button><button id="enableAudio" class="primary">ENABLE AUDIO</button>
+ <p class="audioCaption">Dialogue uses subtitles. Settings save on this device.</p>
+</section>
 <aside id="paymentDesk" hidden aria-label="Payment equipment"></aside>
 <main id="counter" aria-label="Cashier counter">
  <section class="station" aria-label="Customer order"><div class="stationTitle">01 / Customer request <span id="ticketType">ORDER #000</span></div><div class="paperNote" id="ticket"><div class="ticketEmpty">Clock in to begin your shift.<br><br>Take orders. Scan products. Run the pumps. Count the change.</div></div><div class="stationFoot"><span class="tiny" id="visitorFoot">NO ONE AT WINDOW</span><button class="secondary" id="idBtn" style="display:none">CHECK ID</button><button class="secondary" id="refuseBtn" style="display:none">REFUSE SALE</button></div></section>
@@ -109,6 +122,8 @@
 <div id="idBox" class="idBox" role="dialog" aria-label="Customer ID card"><button id="idClose" class="idClose" aria-label="Close">×</button><div class="idTitle">STATE IDENTIFICATION • USA</div><div class="idName" id="idName">—</div><div class="idMeta" id="idMeta">—</div><div class="idBadge" id="idResult">—</div><div class="smallPrint" style="color:#36545a">STORE POLICY: TOBACCO SALES REQUIRE AGE 21+</div></div>
 <div id="pulseNotice" role="status" aria-live="polite"></div><div id="modalWrap"><div id="modal" role="dialog" aria-modal="true" aria-label="Shift briefing"></div></div>
 </div>
+<script src="assets/audio/catalog.js"></script>
+<script src="audio.js"></script>
 <script>
 'use strict';
 const $=id=>document.getElementById(id), fmt=n=>'$'+(n/100).toFixed(2), money=n=>Math.round(n*100);
@@ -150,7 +165,8 @@ const SHIFTS=[
  ]}
 ];
 let state={shift:0,index:0,phase:'intro',basket:{},fuel:null,pumpSelection:null,checkedId:false,register:0,completed:0,mistakes:0,refusals:0,encounters:0,customer:null,progress:0};
-let toastTimer, audioOn=false, audioCtx=null;
+let toastTimer;
+const audio=new NightAudio();
 const productArt={
  cola:`<rect x="13" y="4" width="24" height="37" rx="5" fill="#bc5347" stroke="#e7a38b" stroke-width="2"/><ellipse cx="25" cy="5" rx="11" ry="3.5" fill="#d3dbd3"/><path d="M16 19h18v9H16z" fill="#f2dfc4"/><text x="25" y="26" text-anchor="middle" font-size="9" font-weight="900" fill="#992e2c">N</text>`,
  chips:`<path d="M12 4Q25 7 38 4L43 40Q24 45 7 40Z" fill="#db9e42" stroke="#f8d884" stroke-width="2"/><path d="M12 16l25-3-1 13-22 3z" fill="#b65a3a"/><text x="25" y="26" text-anchor="middle" font-size="10" font-weight="900" fill="#fee7ba">9</text>`,
@@ -161,7 +177,6 @@ const productArt={
  batteries:`<rect x="11" y="11" width="13" height="28" rx="2" fill="#6f947e" stroke="#b6e1b4" stroke-width="2"/><rect x="27" y="11" width="13" height="28" rx="2" fill="#a2ba8f" stroke="#d7e6ba" stroke-width="2"/><rect x="15" y="7" width="5" height="4" fill="#e5cc8a"/><rect x="31" y="7" width="5" height="4" fill="#e5cc8a"/><path d="M16 21h4m-2-2v4M32 21h4m-2-2v4" stroke="#e9dcaa" stroke-width="2"/>`,
  sandwich:`<path d="M7 22Q25 2 43 23L35 39H15Z" fill="#d5b67b" stroke="#efddae" stroke-width="2"/><path d="M9 26Q25 16 41 25" stroke="#8ab17d" stroke-width="6"/><path d="M9 29Q25 23 40 29" stroke="#a65a4c" stroke-width="5"/><path d="M11 33Q25 28 38 32" stroke="#e3ce87" stroke-width="5"/>`
 };
-function sound(freq=440,duration=.05,type='sine'){if(!audioOn)return;try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(.028,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+duration)}catch(e){}}
 function flash(msg,ms=2600){$('pulseNotice').textContent=msg;$('pulseNotice').classList.add('pulseOn');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('pulseNotice').classList.remove('pulseOn'),ms)}
 function iconFor(p){return `<svg viewBox="0 0 50 48" role="img" aria-label="${p.name}">${productArt[p.art]}</svg>`}
 function totalBasket(){return Object.entries(state.basket).reduce((sum,[id,n])=>sum+goods[id].price*n,0)+(state.fuel?.amount||0)}
@@ -202,13 +217,14 @@ function renderPortrait(c){
   sprite.setAttribute('transform','translate(800 435) scale(1.35)');
 }
 function renderCatalog(){const lock=!['serving'].includes(state.phase);$('catalogGrid').innerHTML=PRODUCTS.map(p=>`<button type="button" class="product" data-product="${p.id}" ${lock?'disabled':''} title="Scan ${p.name}"><span class="stockTag">IN STOCK</span><span class="productPic">${iconFor(p)}</span><span class="productName">${p.name}</span><span class="productPrice">${fmt(p.price)}</span></button>`).join('');for(const b of document.querySelectorAll('[data-product]'))b.onclick=()=>scan(b.dataset.product)}
-function scan(id){if(state.phase!=='serving')return;selectTerminal('checkout');$('counter').querySelector('.screen').classList.remove('scannerFlash');void $('counter').offsetWidth;$('counter').querySelector('.screen').classList.add('scannerFlash');state.basket[id]=(state.basket[id]||0)+1;sound(820,.055);renderReceipt();renderCatalog()}
-function removeOne(id){if(state.phase!=='serving')return;if(state.basket[id]>1)state.basket[id]--;else delete state.basket[id];sound(260,.06);renderReceipt()}
+function scan(id){if(state.phase!=='serving')return;selectTerminal('checkout');$('counter').querySelector('.screen').classList.remove('scannerFlash');void $('counter').offsetWidth;$('counter').querySelector('.screen').classList.add('scannerFlash');state.basket[id]=(state.basket[id]||0)+1;audio.play('scanner',{pan:.4,gain:.42});renderReceipt();renderCatalog()}
+function removeOne(id){if(state.phase!=='serving')return;if(state.basket[id]>1)state.basket[id]--;else delete state.basket[id];audio.play('key',{pan:.6,gain:.3});renderReceipt()}
 function renderReceipt(){const lines=Object.entries(state.basket).map(([id,qty])=>`<div class="receiptLine"><span><button data-remove="${id}" aria-label="Remove one ${goods[id].name}">−</button>${qty} × ${goods[id].name.toUpperCase()}</span><span>${fmt(goods[id].price*qty)}</span></div>`).join('');const fuel=state.fuel?`<div class="receiptLine"><span><button id="removeFuel" aria-label="Remove fuel">−</button>PUMP ${String(state.fuel.pump).padStart(2,'0')} / PREPAY</span><span>${fmt(state.fuel.amount)}</span></div>`:'';$('receiptLines').innerHTML=lines+fuel||'<div class="mutedReceipt">NO ITEMS SCANNED<br>AWAITING PRODUCT...</div>';$('subtotalText').textContent=fmt(totalBasket()-(state.fuel?.amount||0));$('totalText').textContent=fmt(totalBasket());document.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>removeOne(b.dataset.remove));if($('removeFuel'))$('removeFuel').onclick=()=>{if(state.phase!=='serving')return;state.fuel=null;renderReceipt()};$('receiptLines').querySelectorAll('button').forEach(b=>b.disabled=state.phase!=='serving');$('chargeBtn').disabled=state.phase!=='serving';$('terminalStatus').textContent=state.phase==='paying'?'PAYMENT':state.phase==='serving'?'SCANNING':'STANDBY'}
 function renderTicket(){const c=customerNow();$('ticketType').textContent=`ORDER #${String(state.shift*6+state.index+101)}`;$('visitorFoot').textContent=`${c.payment==='cash'?'CASH':'CARD'} PAYMENT • WINDOW 03`;$('ticket').innerHTML=`<div class="ticketName">${c.name}</div><div class="ticketDetail">WINDOW SERVICE · ORDER RECEIVED</div><div class="ticketHeading">CUSTOMER REQUESTED</div>${Object.entries(c.items).map(([id,n])=>`<div class="ticketLine"><span>${n} × ${goods[id].name.toUpperCase()}</span><span>${fmt(n*goods[id].price)}</span></div>`).join('')||'<div class="ticketLine"><span>NO COUNTER ITEMS</span></div>'}${c.fuel?`<div class="ticketFuel">⛽ PREPAY · PUMP ${String(c.fuel.pump).padStart(2,'0')} · ${fmt(c.fuel.amount)}</div>`:''}<div class="ticketBottom">PAYMENT METHOD: ${c.payment.toUpperCase()}<br>${c.items.smokes?'TOBACCO ITEM → VERIFY ID':'NO ID CHECK REQUIRED'}</div>`}
 function updateHud(){const n=SHIFTS[state.shift];const count=state.index+(state.phase==='result'?1:0);const timeMins=23*60+count*60;const h=Math.floor(timeMins/60)%24;const mm=timeMins%60;$('shiftText').textContent=`0${state.shift+1} / 03`;$('timeText').textContent=`${h%12||12}:${String(mm).padStart(2,'0')} ${h>=12?'PM':'AM'}`;$('moneyText').textContent=fmt(state.register);$('queueText').textContent=`${String(count).padStart(2,'0')} / ${String(n.customers.length).padStart(2,'0')}`;$('receiptNumber').textContent=`${String(state.shift+1).padStart(2,'0')}${String(state.index+1).padStart(4,'0')}`;$('rulesContent').innerHTML=n.rules.map((r,i)=>`<p style="margin:8px 0">${String(i+1).padStart(2,'0')}. ${r}</p>`).join('')}
 function updateBubble(line){$('bubbleName').textContent=`${customerNow().name.toUpperCase()} // INTERCOM`;$('bubbleText').textContent=line;$('bubble').style.display='block'}
 function startCustomer(){
+  audio.setScene('working',state.shift);
   cleanState();
   const c=customerNow(), token=activityToken;
   state.customer=c;
@@ -220,8 +236,9 @@ function startCustomer(){
   $('cashInfo').textContent=''; $('chargeBtn').textContent='WAITING FOR CUSTOMER';
   const fromX=state.index%2?1180:410;
   const duration=reduceMotion()?80:2200+(state.index%3)*350;
+  audio.customerApproach({duration:duration/1000,index:state.index});
   arrivalAnimation=$('customerSprite').animate([
-    {transform:'translate('+fromX+'px, 392px) scale(.26)',opacity:.25},
+    {transform:'translate('+fromX+'px, 392px) scale(.26)',opacity:0},
     {transform:'translate('+(fromX+(800-fromX)*.6)+'px, 409px) scale(.62)',opacity:.85,offset:.6},
     {transform:'translate(800px, 435px) scale(1.35)',opacity:1}
   ],{duration,easing:'ease-in-out',fill:'both'});
@@ -237,7 +254,7 @@ function startCustomer(){
     $('intercom').style.display='block';
     $('chargeBtn').textContent='RING UP ORDER →';
     $('idBtn').style.display=c.items.smokes?'block':'none';
-    sound(470,.1,'triangle');
+    audio.customerAtWindow(c,state.index);
     const body=$('customerSprite').querySelector('.customerBody');
     if(!reduceMotion())body?.animate([{transform:'translateY(0)'},{transform:'translateY(-2px)'},{transform:'translateY(0)'}],{duration:3800+(state.index%3)*400,iterations:Infinity});
   }).catch(()=>{});
@@ -247,7 +264,7 @@ function checkOrder(){const c=customerNow();for(const p of PRODUCTS){if((state.b
 function charge(){
   if(state.phase!=='serving')return;
   const problem=checkOrder();
-  if(problem){flash(problem,3200);sound(190,.18,'sawtooth');return}
+  if(problem){flash(problem,3200);audio.play('warning',{pan:.6,gain:.35});return}
   const c=customerNow(), total=totalBasket();
   payment={method:c.payment,total,tender:c.tender??Math.ceil((total+50)/500)*500,stage:c.payment==='cash'?'cash-offered':'card-ready',tray:[]};
   state.phase='paying';
@@ -258,7 +275,7 @@ function charge(){
   $('cashInfo').textContent=c.payment==='cash'?'CASH OFFERED / '+fmt(payment.tender):'SEND TOTAL TO CARD READER';
   renderReceipt(); renderCatalog(); renderPayment();
   $('paymentDesk').querySelector('#takeCash,#sendCard')?.focus({preventScroll:true});
-  sound(650,.09);
+  audio.play('counter-place',{pan:-.12,gain:.25});audio.play('key',{pan:.6,gain:.22});audio.play('keypad',{pan:.6,gain:.2});
 }
 function confirmChange(){
   if(state.phase!=='paying'||payment?.stage!=='counting')return;
@@ -266,7 +283,7 @@ function confirmChange(){
   if(returned!==expected){
     state.mistakes++;
     flash('Count again. Tray '+fmt(returned)+' / change due '+fmt(expected)+'.',3200);
-    sound(130,.19,'sawtooth');
+    audio.play('warning',{pan:.6,gain:.35});
     return;
   }
   payment.stage='approved';
@@ -274,6 +291,8 @@ function confirmChange(){
 }
 function editOrder(){
   if(state.phase!=='paying'||!payment||['authorizing','approved'].includes(payment.stage))return;
+  audio.cancel('action');
+  if(payment.stage==='counting')audio.play('drawer-close',{pan:.55,gain:.32});
   state.phase='serving'; payment=null;
   $('paymentDesk').hidden=true;
   $('chargeBtn').style.display='block'; $('resetBtn').style.display='none';
@@ -303,21 +322,21 @@ function nextCustomer(){
     shiftEnd();
   }else startCustomer();
 }
-function shiftEnd(){state.phase='endshift';updateHud();let isFinal=state.shift===2;if(isFinal){let good=state.mistakes<=3;showModal(`<div class="modalEyebrow">// END OF NIGHT / THE ROAD IS EMPTY</div><h2 class="modalTitle">${good?'CLOCK<br><em>OUT.</em>':'THE<br><em>WINDOW.</em>'}</h2><p class="modalCopy">${good?'You balanced the till and kept the window shut. At sunrise, the station has vanished from the roadside map. There is still money in your register.':'The register is full, but something has been watching every mistake. There is a knock on the other side of the counter. Then another knock from inside the glass.'}</p><div class="thinLine"></div><div class="modalStat"><span>SALES PROCESSED</span><strong>${state.completed} / 18</strong></div><div class="modalStat"><span>TOTAL REVENUE</span><strong>${fmt(state.register)}</strong></div><div class="modalStat"><span>CHANGE ERRORS</span><strong>${state.mistakes}</strong></div><div class="modalStat"><span>UNDERAGE SALES REFUSED</span><strong>${state.refusals}</strong></div><div class="modalButtons"><button class="primary" id="primaryModal">PLAY AGAIN →</button></div><div class="smallPrint">NIGHT WINDOW • AN ORIGINAL SINGLE-FILE BROWSER GAME</div>`);$('primaryModal').onclick=()=>{state={shift:0,index:0,phase:'intro',basket:{},fuel:null,pumpSelection:null,checkedId:false,register:0,completed:0,mistakes:0,refusals:0,encounters:0,customer:null};showIntro()};return}
+function shiftEnd(){audio.setScene('end',state.shift);audio.play('shutdown',{pan:.6,gain:.3});state.phase='endshift';updateHud();let isFinal=state.shift===2;if(isFinal){let good=state.mistakes<=3;showModal(`<div class="modalEyebrow">// END OF NIGHT / THE ROAD IS EMPTY</div><h2 class="modalTitle">${good?'CLOCK<br><em>OUT.</em>':'THE<br><em>WINDOW.</em>'}</h2><p class="modalCopy">${good?'You balanced the till and kept the window shut. At sunrise, the station has vanished from the roadside map. There is still money in your register.':'The register is full, but something has been watching every mistake. There is a knock on the other side of the counter. Then another knock from inside the glass.'}</p><div class="thinLine"></div><div class="modalStat"><span>SALES PROCESSED</span><strong>${state.completed} / 18</strong></div><div class="modalStat"><span>TOTAL REVENUE</span><strong>${fmt(state.register)}</strong></div><div class="modalStat"><span>CHANGE ERRORS</span><strong>${state.mistakes}</strong></div><div class="modalStat"><span>UNDERAGE SALES REFUSED</span><strong>${state.refusals}</strong></div><div class="modalButtons"><button class="primary" id="primaryModal">PLAY AGAIN →</button></div><div class="smallPrint">NIGHT WINDOW • AN ORIGINAL BROWSER GAME</div>`);$('primaryModal').onclick=()=>{state={shift:0,index:0,phase:'intro',basket:{},fuel:null,pumpSelection:null,checkedId:false,register:0,completed:0,mistakes:0,refusals:0,encounters:0,customer:null};showIntro()};return}
 showModal(`<div class="modalEyebrow">// SHIFT ${String(state.shift+1).padStart(2,'0')} COMPLETE / 05:00 AM</div><h2 class="modalTitle">THE SUN<br><em>COMES UP.</em></h2><p class="modalCopy">You made it through ${SHIFTS[state.shift].title.toLowerCase()}. The overnight manager left a fresh roll of receipt paper and another set of instructions.</p><div class="thinLine"></div><div class="modalStat"><span>SALES SO FAR</span><strong>${state.completed}</strong></div><div class="modalStat"><span>REGISTER</span><strong>${fmt(state.register)}</strong></div><div class="modalStat"><span>CHANGE MISTAKES</span><strong>${state.mistakes}</strong></div><div class="modalButtons"><button class="primary" id="primaryModal">START SHIFT ${String(state.shift+2).padStart(2,'0')} →</button></div>`);$('primaryModal').onclick=()=>{state.shift++;state.index=0;beginShift()}}
-function showModal(html){$('modal').innerHTML=html;$('modalWrap').style.display='flex';$('modal').querySelector('button')?.focus()}function hideModal(){$('modalWrap').style.display='none'}
-function showIntro(){state.phase='intro';$('customerSprite').innerHTML='';$('bubble').style.display='none';$('customerMeta').style.display='none';$('intercom').style.display='none';$('chargeBtn').disabled=true;renderCatalog();renderReceipt();updateHud();showModal(`<div class="modalEyebrow">NORTHLINE GAS / MILE MARKER NINE / WINDOW 03</div><h1 class="modalTitle">NIGHT<br><em>WINDOW.</em></h1><p class="modalCopy">You're the overnight cashier at a lonely gas station. You work from a locked glass booth. Customers arrive at the window looking for snacks, cigarettes, and prepaid gasoline.</p><p class="modalCopy">Read their order. Scan items from the shelf, authorize their fuel pump, take their payment, and count their change. Some visitors have stranger requests.</p><div class="thinLine"></div><div class="modalEyebrow">THREE SHIFTS · 18 CUSTOMERS · REAL CASHIER GAMEPLAY</div><div class="modalButtons"><button class="primary" id="primaryModal">CLOCK IN →</button></div><div class="smallPrint">Mouse and keyboard • No account or download required after opening the HTML file.<br>Original browser prototype — not affiliated with Evenin' Shift.</div>`);$('primaryModal').onclick=()=>{ledger=[];payment=null;activityToken++;$('paymentDesk').hidden=true;beginShift()}}
-function beginShift(){state.phase='brief';state.basket={};state.fuel=null;state.checkedId=false;updateHud();renderCatalog();renderReceipt();const n=SHIFTS[state.shift];showModal(`<div class="modalEyebrow">// SHIFT ${String(state.shift+1).padStart(2,'0')} / 11:00 PM TO 05:00 AM</div><h2 class="modalTitle">${n.title.split(' ')[0]}<br><em>${n.title.split(' ')[1]}.</em></h2><p class="modalCopy">${n.subtitle}</p><div class="thinLine"></div><div class="modalEyebrow">READ THE SUPERVISOR'S NOTES</div>${n.rules.map((r,i)=>`<div class="modalRule">${String(i+1).padStart(2,'0')} / ${r}</div>`).join('')}<div class="modalButtons"><button class="primary" id="primaryModal">UNLOCK THE REGISTER →</button></div>`);$('primaryModal').onclick=()=>{hideModal();startCustomer();flash('The register is open. Someone is walking over from the pumps.',3000)}}
-$('intercom').onclick=()=>{const c=customerNow();updateBubble(`“${c.speech}”`);sound(310,.05)};
+function showModal(html){$('modal').innerHTML=html;$('modalWrap').style.display='flex';$('modal').querySelector('button')?.focus();if($('introAudio'))$('introAudio').onclick=()=>$('soundToggle').click()}function hideModal(){$('modalWrap').style.display='none'}
+function showIntro(){audio.setScene('intro',0);state.phase='intro';$('customerSprite').innerHTML='';$('bubble').style.display='none';$('customerMeta').style.display='none';$('intercom').style.display='none';$('chargeBtn').disabled=true;renderCatalog();renderReceipt();updateHud();showModal(`<div class="modalEyebrow">NORTHLINE GAS / MILE MARKER NINE / WINDOW 03</div><h1 class="modalTitle">NIGHT<br><em>WINDOW.</em></h1><p class="modalCopy">You're the overnight cashier at a lonely gas station. You work from a locked glass booth. Customers arrive at the window looking for snacks, cigarettes, and prepaid gasoline.</p><p class="modalCopy">Read their order. Scan items from the shelf, authorize their fuel pump, take their payment, and count their change. Some visitors have stranger requests.</p><div class="thinLine"></div><div class="modalEyebrow">THREE SHIFTS · 18 CUSTOMERS · REAL CASHIER GAMEPLAY</div><div class="modalButtons"><button class="primary" id="primaryModal">CLOCK IN →</button><button class="secondary" id="introAudio">AUDIO SETTINGS</button></div><div class="smallPrint">Mouse and keyboard • No account or download required after opening the HTML file.<br>Original browser prototype — not affiliated with Evenin' Shift.</div>`);$('primaryModal').onclick=()=>{void audio.unlock().then(ok=>{if(ok&&audio.scene!=='intro')audio.play('startup',{pan:.6,gain:.32})});ledger=[];payment=null;activityToken++;$('paymentDesk').hidden=true;beginShift()}}
+function beginShift(){audio.setScene('brief',state.shift);state.phase='brief';state.basket={};state.fuel=null;state.checkedId=false;updateHud();renderCatalog();renderReceipt();const n=SHIFTS[state.shift];showModal(`<div class="modalEyebrow">// SHIFT ${String(state.shift+1).padStart(2,'0')} / 11:00 PM TO 05:00 AM</div><h2 class="modalTitle">${n.title.split(' ')[0]}<br><em>${n.title.split(' ')[1]}.</em></h2><p class="modalCopy">${n.subtitle}</p><div class="thinLine"></div><div class="modalEyebrow">READ THE SUPERVISOR'S NOTES</div>${n.rules.map((r,i)=>`<div class="modalRule">${String(i+1).padStart(2,'0')} / ${r}</div>`).join('')}<div class="modalButtons"><button class="primary" id="primaryModal">UNLOCK THE REGISTER →</button></div>`);$('primaryModal').onclick=()=>{hideModal();startCustomer();flash('The register is open. Someone is walking over from the pumps.',3000)}}
+$('intercom').onclick=()=>{const c=customerNow();updateBubble(`“${c.speech}”`);audio.play('intercom',{pan:-.15,gain:.28})};
 $('chargeBtn').onclick=charge;$('resetBtn').onclick=editOrder;
-$('clearBtn').onclick=()=>{if(state.phase!=='serving')return;state.basket={};sound(280,.06);renderReceipt()};
+$('clearBtn').onclick=()=>{if(state.phase!=='serving')return;state.basket={};audio.play('key',{pan:.6,gain:.3});renderReceipt()};
 $('pumpsBtn').onclick=()=>{if(state.phase!=='serving')return;$('pumpBox').style.display='block';$('pumpFeedback').textContent='Select a pump to begin.';$('fuelInput').value=state.fuel? (state.fuel.amount/100).toFixed(2):'';state.pumpSelection=state.fuel?.pump||null;renderPumpPicks()};$('pumpClose').onclick=()=>$('pumpBox').style.display='none';
-function renderPumpPicks(){$('pumpGrid').innerHTML=[1,2,3,4].map(n=>`<button class="pumpPick ${state.pumpSelection===n?'selected':''}" data-pump="${n}">0${n}</button>`).join('');document.querySelectorAll('[data-pump]').forEach(b=>b.onclick=()=>{state.pumpSelection=Number(b.dataset.pump);renderPumpPicks();sound(570,.07)})}
-$('authorizeBtn').onclick=()=>{let str=$('fuelInput').value.trim().replace(/^\$/,'');if(state.phase!=='serving')return;if(!state.pumpSelection){$('pumpFeedback').textContent='SELECT A PUMP FIRST.';return}if(!/^\d+(\.\d{1,2})?$/.test(str)||money(Number(str))<=0){$('pumpFeedback').textContent='ENTER A VALID DOLLAR AMOUNT.';return}state.fuel={pump:state.pumpSelection,amount:money(Number(str))};$('pumpBox').style.display='none';renderReceipt();flash(`Pump ${state.fuel.pump} authorized for ${fmt(state.fuel.amount)}.`);sound(810,.1)};
-$('idBtn').onclick=()=>{const c=customerNow();if(state.phase!=='serving'||!c.items.smokes)return;state.checkedId=true;$('idName').textContent=c.name.toUpperCase();$('idMeta').innerHTML=`AGE: ${c.age}<br>EXPIRES: 07 / 2029<br>DOCUMENT: DRIVER LICENSE`;$('idResult').textContent=c.age>=21?'✓ AGE VERIFIED — 21 OR OLDER':'✕ UNDERAGE — DO NOT SELL';$('idResult').style.background=c.age>=21?'#235a48':'#853a3a';$('idBox').style.display='block';$('refuseBtn').style.display=c.age<21?'block':'none';flash(c.age>=21?'ID VERIFIED: TOBACCO SALE PERMITTED.':'ID FAILED: CUSTOMER UNDER 21. REFUSE SALE.',3200)};$('idClose').onclick=()=>$('idBox').style.display='none';$('refuseBtn').onclick=refuseSale;
+function renderPumpPicks(){$('pumpGrid').innerHTML=[1,2,3,4].map(n=>`<button class="pumpPick ${state.pumpSelection===n?'selected':''}" data-pump="${n}">0${n}</button>`).join('');document.querySelectorAll('[data-pump]').forEach(b=>b.onclick=()=>{state.pumpSelection=Number(b.dataset.pump);renderPumpPicks();audio.play('key',{pan:.45,gain:.23});audio.play('keypad',{pan:.45,gain:.22})})}
+$('authorizeBtn').onclick=()=>{let str=$('fuelInput').value.trim().replace(/^\$/,'');if(state.phase!=='serving')return;if(!state.pumpSelection){$('pumpFeedback').textContent='SELECT A PUMP FIRST.';audio.play('warning',{pan:.5,gain:.25});return}if(!/^\d+(\.\d{1,2})?$/.test(str)||money(Number(str))<=0){$('pumpFeedback').textContent='ENTER A VALID DOLLAR AMOUNT.';audio.play('warning',{pan:.5,gain:.25});return}state.fuel={pump:state.pumpSelection,amount:money(Number(str))};$('pumpBox').style.display='none';renderReceipt();flash(`Pump ${state.fuel.pump} authorized for ${fmt(state.fuel.amount)}.`);const authorizedPump=state.fuel.pump;audio.play('relay',{pan:.5,gain:.4});audio.later(.16,()=>audio.play('pump-start',{group:'encounter',outside:true,gain:.2,pan:authorizedPump%2?-.65:.65}));audio.later(.25,()=>audio.play('notification',{gain:.22,pan:.5}),'action')};
+$('idBtn').onclick=()=>{const c=customerNow();if(state.phase!=='serving'||!c.items.smokes)return;state.checkedId=true;audio.play('paper',{pan:-.2,gain:.3});$('idName').textContent=c.name.toUpperCase();$('idMeta').innerHTML=`AGE: ${c.age}<br>EXPIRES: 07 / 2029<br>DOCUMENT: DRIVER LICENSE`;$('idResult').textContent=c.age>=21?'✓ AGE VERIFIED — 21 OR OLDER':'✕ UNDERAGE — DO NOT SELL';$('idResult').style.background=c.age>=21?'#235a48':'#853a3a';$('idBox').style.display='block';$('refuseBtn').style.display=c.age<21?'block':'none';flash(c.age>=21?'ID VERIFIED: TOBACCO SALE PERMITTED.':'ID FAILED: CUSTOMER UNDER 21. REFUSE SALE.',3200)};$('idClose').onclick=()=>$('idBox').style.display='none';$('refuseBtn').onclick=refuseSale;
 $('ruleToggle').onclick=()=>{$('rulesPanel').style.display=$('rulesPanel').style.display==='block'?'none':'block'};
 $('glassPattern').ondblclick=()=>{$('glassPattern').style.opacity='.15';flash('You wiped the condensation from the glass.')};
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('pumpBox').style.display='none';$('idBox').style.display='none';$('rulesPanel').style.display='none'}if(e.key.toLowerCase()==='e'&&document.activeElement?.tagName!=='INPUT'&&state.phase==='serving')$('intercom').click()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('pumpBox').style.display='none';$('idBox').style.display='none';$('rulesPanel').style.display='none';closeAudioPanel()}if(e.key.toLowerCase()==='e'&&document.activeElement?.tagName!=='INPUT'&&state.phase==='serving')$('intercom').click()});
 // All currency values, including individual coins, are integer cents.
 const DENOMINATIONS=[2000,1000,500,100,25,10,5,1];
 let payment=null, ledger=[], activityToken=0, arrivalAnimation=null, terminalTab='checkout';
@@ -353,17 +372,17 @@ function renderPayment(){
   if(p.method==='cash'){
     if(p.stage==='cash-offered'){
       paymentShell('CASH / SERVICE TRAY','<div class="paymentDisplay">CUSTOMER HAS PLACED<strong>'+fmt(p.tender)+'</strong>IN THE SERVICE TRAY<div class="receiptLine"><span>ORDER TOTAL</span><span>'+fmt(p.total)+'</span></div></div><p class="paymentHelp">Take the cash, then count bills and coins out of the drawer. Your payout must match the change due.</p><button id="takeCash" class="primary" style="width:100%">TAKE CASH / OPEN DRAWER →</button>');
-      $('takeCash').onclick=()=>{if(state.phase!=='paying'||p!==payment||p.stage!=='cash-offered')return;p.stage='counting';sound(180,.15,'triangle');renderPayment()};
+      $('takeCash').onclick=()=>{if(state.phase!=='paying'||p!==payment||p.stage!=='cash-offered')return;p.stage='counting';audio.play('paper',{pan:.2,gain:.36});audio.play('drawer-open',{pan:.55,gain:.5});renderPayment()};
     }else if(p.stage==='counting'){
       const sum=p.tray.reduce((a,b)=>a+b,0),due=p.tender-p.total;
       paymentShell('NORTHLINE / CASH DRAWER','<div class="paymentDisplay"><div class="receiptLine"><span>TOTAL / PAID</span><span>'+fmt(p.total)+' / '+fmt(p.tender)+'</span></div><div class="receiptLine"><span>CHANGE DUE</span><span>'+fmt(due)+'</span></div><strong>TRAY '+fmt(sum)+'</strong></div><div class="denominations">'+DENOMINATIONS.map(v=>'<button class="'+(v<100?'coin':'bill')+'" data-denom="'+v+'" aria-label="Add '+fmt(v)+' to change">'+(v>=100?'$'+v/100:v+'¢')+'</button>').join('')+'</div><div class="drawerTray" aria-label="Change tray">'+(p.tray.length?p.tray.map((v,i)=>'<button data-undo="'+i+'" aria-label="Remove '+fmt(v)+' from tray">'+fmt(v)+' ×</button>').join(''):'<span class="paymentHelp">Tray empty</span>')+'</div><p class="paymentHelp">Click denominations to count change. Click a tray amount to put it back. Exact cash? Return an empty tray.</p><div class="paymentActions"><button class="secondary" id="clearTray">CLEAR</button><button class="primary" id="giveChange">RETURN CHANGE →</button></div>');
       document.querySelectorAll('[data-denom]').forEach(b=>b.onclick=()=>{
         if(payment!==p||p.stage!=='counting')return;
         if(p.tray.length>=100){flash('Tray full. Use larger bills or clear the tray.');return}
-        p.tray.push(Number(b.dataset.denom));sound(640+Number(b.dataset.denom)%100,.035);renderPayment();
+        p.tray.push(Number(b.dataset.denom));audio.play(Number(b.dataset.denom)<100?'coin':'paper',{pan:.5,gain:Number(b.dataset.denom)<100?.37:.3});renderPayment();
       });
-      document.querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>{if(payment!==p||p.stage!=='counting')return;p.tray.splice(Number(b.dataset.undo),1);renderPayment()});
-      $('clearTray').onclick=()=>{if(payment!==p)return;p.tray=[];renderPayment()};
+      document.querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>{if(payment!==p||p.stage!=='counting')return;const value=p.tray.splice(Number(b.dataset.undo),1)[0];audio.play(value<100?'coin':'paper',{pan:.5,gain:.22});renderPayment()});
+      $('clearTray').onclick=()=>{if(payment!==p)return;p.tray=[];audio.play('paper',{pan:.5,gain:.2});renderPayment()};
       $('giveChange').onclick=confirmChange;
     }
   }else{
@@ -373,12 +392,12 @@ function renderPayment(){
        p.stage==='awaiting-tap'?'<button id="tapCard" class="cardTarget"><span class="contactless">)))</span>CUSTOMER CARD / TAP HERE</button><p class="paymentHelp">The customer holds their card above the reader.</p>':
        p.stage==='authorizing'?'<div class="cardTarget">PROCESSING…<br>PLEASE DO NOT REMOVE CARD</div>':
        '<p class="paymentHelp">Authorization accepted. Print the receipt and hand it through the slot.</p><button id="printReceipt" class="primary" style="width:100%">PRINT RECEIPT / FINISH →</button>'));
-    if($('sendCard'))$('sendCard').onclick=()=>{if(payment!==p||p.stage!=='card-ready')return;p.stage='awaiting-tap';sound(740,.07);renderPayment()};
+    if($('sendCard'))$('sendCard').onclick=()=>{if(payment!==p||p.stage!=='card-ready')return;p.stage='awaiting-tap';audio.play('keypad',{pan:.6,gain:.25});renderPayment()};
     if($('tapCard'))$('tapCard').onclick=()=>{
       if(payment!==p||p.stage!=='awaiting-tap')return;
-      p.stage='authorizing';$('resetBtn').disabled=true;renderPayment();sound(910,.08);
+      p.stage='authorizing';$('resetBtn').disabled=true;renderPayment();audio.play('card-tap',{pan:.5,gain:.4});audio.later(.3,()=>audio.play('processing',{pan:.5,gain:.15}),'action');
       const token=activityToken;
-      setTimeout(()=>{if(payment!==p||activityToken!==token||state.phase!=='paying')return;p.stage='approved';renderPayment();$('printReceipt')?.focus({preventScroll:true});sound(1100,.1)},reduceMotion()?100:1600);
+      setTimeout(()=>{if(payment!==p||activityToken!==token||state.phase!=='paying')return;p.stage='approved';renderPayment();$('printReceipt')?.focus({preventScroll:true});audio.play('approved',{pan:.5,gain:.34})},reduceMotion()?100:1600);
     };
     if($('printReceipt'))$('printReceipt').onclick=completeSale;
   }
@@ -387,6 +406,7 @@ function renderPayment(){
 }
 
 function finishTransaction(refused){
+  audio.setScene('result',state.shift);
   const c=customerNow(), amount=refused?0:payment.total;
   const tender=!refused&&payment.method==='cash'?payment.tender:null;
   ledger.push({name:c.name,total:amount,method:refused?'ID CHECK':payment.method.toUpperCase(),status:refused?'REFUSED':'PAID',shift:state.shift+1});
@@ -403,8 +423,9 @@ function finishTransaction(refused){
   $('terminalStatus').textContent=refused?'REFUSED':'PAID';
   updateBubble(c.after);$('bubbleName').textContent='NORTHLINE / SHIFT JOURNAL';
   $('game').classList.remove('haunted');
-  sound(refused?300:960,.08);if(!refused)setTimeout(()=>sound(1290,.09),100);
+  if(refused)audio.play('paper',{pan:-.15,gain:.3});else{audio.play('receipt',{pan:.6,gain:.4});if(tender!==null){audio.play('drawer-close',{pan:.55,gain:.4});audio.play('approved',{pan:.55,gain:.22})}}
   const token=activityToken;
+  audio.customerDeparture({duration:(reduceMotion()?80:1900)/1000,index:state.index,customer:c});
   arrivalAnimation?.cancel();
   arrivalAnimation=$('customerSprite').animate([
     {transform:'translate(800px,435px) scale(1.35)',opacity:1},
@@ -428,42 +449,62 @@ function buildPedestrians(){
   else document.querySelectorAll('.passer').forEach((el,i)=>el.setAttribute('transform','translate('+(210+i*470)+' 410)'));
 }
 
-$('checkoutTab').onclick=()=>selectTerminal('checkout');
-$('ledgerTab').onclick=()=>selectTerminal('ledger');
-$('stockTab').onclick=()=>selectTerminal('stock');
-$('soundToggle').onclick=()=>{audioOn=!audioOn;setAmbience(audioOn);$('soundToggle').setAttribute('aria-pressed',String(audioOn));$('soundToggle').textContent='SOUND: '+(audioOn?'ON':'OFF');if(audioOn)sound(440,.1)};
+$('checkoutTab').onclick=()=>{audio.play('mouse',{pan:.65,gain:.32});selectTerminal('checkout')};
+$('ledgerTab').onclick=()=>{audio.play('mouse',{pan:.65,gain:.32});audio.play('notification',{pan:.65,gain:.12});selectTerminal('ledger')};
+$('stockTab').onclick=()=>{audio.play('mouse',{pan:.65,gain:.32});selectTerminal('stock')};
 $('pendulumToy').onclick=()=>{
   const arm=$('pendulumToy').querySelector('.pendulumArm');
   arm.getAnimations().forEach(a=>{if(a.id==='nudge')a.cancel()});
   const a=arm.animate([{transform:'rotate(-48deg)'},{transform:'rotate(43deg)'},{transform:'rotate(-36deg)'},{transform:'rotate(30deg)'},{transform:'rotate(-25deg)'}],{duration:reduceMotion()?100:5500,easing:'ease-in-out'});a.id='nudge';
-  sound(1200,.035,'sine');flash('The brass pendulum keeps time with the rain.',1800);
+  audio.play('cloth',{pan:-.65,gain:.1});flash('The brass pendulum keeps time with the rain.',1800);
 };
-// Generated rain and a quiet fluorescent hum require no media downloads.
-let ambientNodes=[];
-function setAmbience(enabled){
-  for(const node of ambientNodes){try{node.stop()}catch{}}
-  ambientNodes=[];
-  if(!enabled)return;
-  try{
-    audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();
-    audioCtx.resume();
-    const buffer=audioCtx.createBuffer(1,audioCtx.sampleRate*3,audioCtx.sampleRate);
-    const samples=buffer.getChannelData(0);
-    for(let i=0;i<samples.length;i++)samples[i]=(Math.random()*2-1)*.35;
-    const rain=audioCtx.createBufferSource(),filter=audioCtx.createBiquadFilter(),volume=audioCtx.createGain();
-    rain.buffer=buffer;rain.loop=true;filter.type='lowpass';filter.frequency.value=900;volume.gain.value=.12;
-    rain.connect(filter);filter.connect(volume);volume.connect(audioCtx.destination);rain.start();
-    const hum=audioCtx.createOscillator(),humVolume=audioCtx.createGain();
-    hum.frequency.value=60;hum.type='sine';humVolume.gain.value=.006;hum.connect(humVolume);humVolume.connect(audioCtx.destination);hum.start();
-    ambientNodes=[rain,hum];
-  }catch{}
-}
 // A keyboard user can cycle inside the briefing while it covers the game.
 document.addEventListener('keydown',e=>{
-  if(e.key!=='Tab'||$('modalWrap').style.display==='none')return;
+  if(e.key!=='Tab'||$('modalWrap').style.display==='none'||!$('audioPanel').hidden)return;
   const buttons=[...$('modal').querySelectorAll('button:not(:disabled)')];
-  if(buttons.length===1){e.preventDefault();buttons[0].focus()}
+  if(e.shiftKey&&document.activeElement===buttons[0]){e.preventDefault();buttons.at(-1)?.focus()}
+  if(!e.shiftKey&&document.activeElement===buttons.at(-1)){e.preventDefault();buttons[0]?.focus()}
 });
+function updateAudioControls(){
+  for(const [key,id]of [['master','master'],['ambience','ambience'],['effects','effects']]){
+    $(id+'Volume').value=Math.round(audio.settings[key]*100);
+    $(id+'Value').textContent=Math.round(audio.settings[key]*100)+'%';
+  }
+  $('muteAudio').setAttribute('aria-pressed',String(audio.settings.muted));
+  $('muteAudio').textContent=audio.settings.muted?'UNMUTE':'MUTE';
+  $('enableAudio').hidden=audio.ctx?.state==='running';
+  $('enableAudio').textContent=audio.unlocked?'RESUME AUDIO':'ENABLE AUDIO';
+  $('audioStatus').textContent=!audio.available?'Audio unavailable in this browser. You can keep playing.':audio.settings.muted?'Sound is muted.':audio.ctx?.state==='running'?(audio.scene==='intro'?'Audio ready. Clock in to hear the station.':'Listening from inside the booth.'):audio.unlocked?'Audio paused. Click Resume to listen.':'Clock in or enable audio to hear the station.';
+  $('soundToggle').textContent=audio.settings.muted?'AUDIO / MUTED':'AUDIO / SETTINGS';
+}
+let audioReturnFocus=null;
+function closeAudioPanel(){
+  if($('audioPanel').hidden)return;
+  $('audioPanel').hidden=true;$('soundToggle').setAttribute('aria-expanded','false');(audioReturnFocus?.isConnected?audioReturnFocus:$('soundToggle')).focus({preventScroll:true});
+}
+audio.change=updateAudioControls;
+$('soundToggle').onclick=()=>{
+  if($('audioPanel').hidden)audioReturnFocus=document.activeElement;
+  $('audioPanel').hidden=!$('audioPanel').hidden;
+  $('soundToggle').setAttribute('aria-expanded',String(!$('audioPanel').hidden));
+  if(!$('audioPanel').hidden){updateAudioControls();$('masterVolume').focus({preventScroll:true})}
+};
+$('closeAudio').onclick=closeAudioPanel;
+$('enableAudio').onclick=()=>{void audio.unlock()};
+$('muteAudio').onclick=()=>{audio.setSetting('muted',!audio.settings.muted);if(!audio.settings.muted)void audio.unlock()};
+for(const key of ['master','ambience','effects']){
+  $(key+'Volume').addEventListener('input',e=>audio.setSetting(key,Number(e.target.value)/100));
+}
+$('fuelInput').addEventListener('input',()=>audio.play('key',{gain:.22,pan:.5,cooldown:.07}));
+$('audioPanel').addEventListener('keydown',e=>{
+  if(e.key!=='Tab')return;
+  const controls=[...$('audioPanel').querySelectorAll('button,input')].filter(el=>!el.hidden&&!el.disabled);
+  const first=controls[0],last=controls.at(-1);
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+  if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+});
+audio.watchPendulum($('pendulumToy').querySelector('.pendulumArm'));
+updateAudioControls();
 buildPedestrians();
 
 showIntro();

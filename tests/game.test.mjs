@@ -196,9 +196,12 @@ test('real arrivals animate and responsive layouts keep checkout usable', async 
   await page.locator('#pendulumToy').click();
   assert.equal(await page.evaluate(() => document.querySelector('.pendulumArm').getAnimations().some(a => a.id === 'nudge')), true);
   await page.locator('#soundToggle').click();
-  assert.equal(await page.locator('#soundToggle').getAttribute('aria-pressed'), 'true');
-  await page.locator('#soundToggle').click();
-  assert.equal(await page.locator('#soundToggle').getAttribute('aria-pressed'), 'false');
+  assert.equal(await page.locator('#soundToggle').getAttribute('aria-expanded'), 'true');
+  await page.locator('#muteAudio').click();
+  assert.equal(await page.locator('#muteAudio').getAttribute('aria-pressed'), 'true');
+  await page.locator('#muteAudio').click();
+  assert.equal(await page.locator('#muteAudio').getAttribute('aria-pressed'), 'false');
+  await page.locator('#closeAudio').click();
   await page.screenshot({ path: 'test-results/desktop.png' });
   for (const [width, height] of [[1024, 768], [390, 844], [810, 700]]) {
     await page.setViewportSize({ width, height });

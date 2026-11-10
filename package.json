@@ -5,7 +5,8 @@
   "description": "An offline-ready roadside cashier game",
   "scripts": {
     "dev": "node scripts/serve.mjs",
-    "test": "node --test tests/game.test.mjs"
+    "test": "node --test",
+    "audio:build": "node scripts/build-audio.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.65.0"
