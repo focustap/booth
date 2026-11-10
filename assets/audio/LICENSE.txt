@@ -1,0 +1,6 @@
+NIGHT WINDOW original procedural audio
+
+All WAV files in this directory were synthesized by scripts/build-audio.mjs.
+No field recordings, downloaded samples, voice models, or third-party audio were used.
+The audio assets are dedicated to the public domain under CC0 1.0.
+The generator, catalogue, and offline bundle are part of the game source.

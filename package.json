@@ -1,0 +1,14 @@
+{
+  "name": "night-window",
+  "version": "3.0.0",
+  "private": true,
+  "description": "An offline-ready roadside cashier game",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "test": "node --test",
+    "audio:build": "node scripts/build-audio.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.0"
+  }
+}
